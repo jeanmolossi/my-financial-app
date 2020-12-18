@@ -11,3 +11,7 @@ web-build/
 
 # macOS
 .DS_Store
+
+
+# SECRET FILE
+src/config/firebase.ts
