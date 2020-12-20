@@ -21,7 +21,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const signIn = useCallback(async ({email, password}) => {
     await signInUser(email, password).then(response => {
-      AsyncStorage.setItem('@financial-user', JSON.stringify({ uid: response.user?.uid }))
+      AsyncStorage.setItem('@financial-user', JSON.stringify({ uid: response.uid }))
     });
   }, []);
 
@@ -62,4 +62,4 @@ function useAuth() {
   return context;
 }
 
-export {AuthProvider, useAuth};
+export { AuthProvider, useAuth };

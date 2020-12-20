@@ -1,8 +1,7 @@
 import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
 import React, { useEffect } from 'react';
+import { UserAdapter } from 'financial-core';
 
-import firebase from 'firebase/app';
-import 'firebase/auth';
 
 import AuthTabs from './Auth';
 import { getAuthUser } from '../repositories';
@@ -18,24 +17,12 @@ const screenOptions: StackNavigationOptions = {
 
 
 const Router: React.FC = () => {
+  const userAdapter = new UserAdapter();
   const { updateUser, user } = useAuth();
 
   useEffect(() => {
-    firebase.auth().onAuthStateChanged(function(user) {
-      if(user) {
-        getAuthUser().then(user => {
-          if(user){
-            updateUser(user);
-          }
-        })
-        return;
-      }
-
-      updateUser({} as User);
-    }, () => {
-      console.log('Erro')
-    }, () => { 
-      console.log('UNSUB')
+    userAdapter.onAuthStateChanged(function(user) {      
+      updateUser(user);
     })
   }, []);
 

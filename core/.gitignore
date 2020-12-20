@@ -1,0 +1,4 @@
+node_modules
+dist
+
+lib/firebase/config/firebase.ts

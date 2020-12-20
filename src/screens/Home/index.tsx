@@ -1,15 +1,13 @@
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Dimensions, View } from 'react-native';
 import { Modalize } from 'react-native-modalize';
+import { Transaction } from 'financial-core';
 
 import { AppContainer, Button, Text } from '../../components';
 import { useAuth } from '../../hooks/Auth';
-import { getMyLastBalance, getMyTransactions } from '../../repositories';
-import { parseToCurrency } from '../../utils';
+import { getMyLastBalance, subscribeTransactions } from '../../repositories';
 import CreateCategoryModal, { CreateCategoryModalRef } from './CreateCategoryModal';
 
 import {
@@ -20,13 +18,14 @@ import {
 
 const { height } = Dimensions.get('screen')
 
+
 const Home: React.FC = () => {
   const { navigate } = useNavigation();
   const { user } = useAuth();
 
   const createCategoryModal = useRef<CreateCategoryModalRef>(null);
 
-  const [transactions, setTransactions] = useState([] as any[]);
+  const [transactions, setTransactions] = useState([] as Transaction[]);
   const [balance, setBalance] = useState('0,00');
   const [loadingBalance, setLoadingBalance] = useState(true);
 
@@ -36,65 +35,39 @@ const Home: React.FC = () => {
 
   const handleLoadBalance = useCallback(() => {
     setLoadingBalance(true);
-    getMyLastBalance().then(response => {
-      if(!response) {
-        throw new Error('Sem balanço')
-      };
-
-      setBalance(parseToCurrency(response.balance.balance.toString()))
-      setLoadingBalance(false);
-    })
-    .catch(() => {
-      setTimeout(() => {
-        handleLoadBalance();
+    getMyLastBalance()
+      .then(response => {
+        if(!response) {
+          throw new Error('Sem balanço')
+        };
+  
+        setBalance(response.balance)
         setLoadingBalance(false);
-      }, 3000);
-    })
+      })
   }, []);
 
   useEffect(() => {
-    const unsubscribeTransactions = firebase
-      .firestore()
-      .collection(`users/${user.uid}/transactions`)
-      .orderBy('created_at', 'desc')
-      .limit(25)
-      .onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if(change.type === 'added') {
-            getMyTransactions().then(response => {
-              if(!response)
-                return;
-        
-              const parsedResponse = response.map(transaction => {
-                const { value } = transaction;
-                const parsedValue = parseToCurrency(value);
-        
-                return {
-                  ...transaction,
-                  value: parsedValue
-                }
-              })
-              setTransactions(parsedResponse)
-            })
-          }
-        })
-      })
 
-    const unsubscribeBalance = firebase
-      .firestore()
-      .collection(`users/${user.uid}/balance`)
-      .orderBy('created_at', 'desc')
-      .onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if(change) {
-            handleLoadBalance()
-          }
-        })
-      })
+    const unsubscribeTransactions = subscribeTransactions(setTransactions)
+        .then(unsubcribeCallback => unsubcribeCallback);
+
+    handleLoadBalance()
+
+    // const unsubscribeBalance = firebase
+    //   .firestore()
+    //   .collection(`users/${user.uid}/balance`)
+    //   .orderBy('created_at', 'desc')
+    //   .onSnapshot(snapshot => {
+    //     snapshot.docChanges().forEach(change => {
+    //       if(change) {
+    //         handleLoadBalance()
+    //       }
+    //     })
+    //   })
 
     return () => {
-      unsubscribeTransactions();
-      unsubscribeBalance();
+      unsubscribeTransactions.then(unsub => unsub());
+      // unsubscribeBalance();
     }
   }, []);
   
@@ -191,8 +164,9 @@ const Home: React.FC = () => {
             </View>
           ),
           keyExtractor: (item) => item.uid,
+          // TODO : CHANGE OF CATEGORYNAME TO NAME
           renderItem: ({ item: { uid, category: { categoryName, uid: cUid }, type, identifier, value, images } }) => (
-            <HistoricItem transactionType={type}>
+            <HistoricItem key={uid} transactionType={type}>
               <View style={{ flex: 1 }}>
                 <Text color="black" size="sm">{identifier}</Text>
                 <Text color="black" size="md">R$ {value}</Text>

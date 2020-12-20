@@ -9,7 +9,6 @@ import { Montserrat_400Regular, Montserrat_500Medium, Montserrat_700Bold } from 
 
 import AppProvider from './src/hooks';
 import Router from './src/routers';
-import './src/config/firebase';
 import { ActivityIndicator, View } from 'react-native';
 import StoreProvider from './src/store';
 
