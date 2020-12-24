@@ -1,8 +1,9 @@
 import firebase  from 'firebase/app';
 import 'firebase/firestore';
-import { UserAdapter } from '../../adapters';
+import { BalanceAdapter, UserAdapter } from '../../adapters';
 import { Transaction } from "../../entities";
-import { parseToCurrency } from '../../utils';
+import { TransactionPayload } from '../../useCases/transaction/AddNewTransactionService';
+import { parseCurrencyInputToNumber, parseToCurrency } from '../../utils';
 
 export interface DocTransaction {
   uid: string;
@@ -108,5 +109,87 @@ export class TransactionsRepository {
 
         return unsubscribeTransactions;
       });
+  }
+
+  async addNewTransaction({
+    identifier,
+    category,
+    type,
+    value,
+    images = []
+  }: TransactionPayload) {
+    const userAdapter = new UserAdapter();
+
+    const user = await userAdapter.getAuthUser();
+
+    const centValue = parseCurrencyInputToNumber(value);
+
+    const firebaseStorage = await this.UploadImages(images);
+
+    const response = await firebase
+      .firestore()
+      .collection('users')
+      .doc(user.uid)
+      .collection('transactions')
+      .add({
+        identifier,
+        category,
+        type,
+        value: centValue,
+        images: firebaseStorage,
+        created_at: new Date()
+      })
+      .then(response => response.get().then(doc => doc))
+      .then(doc => ({
+        transaction: { ...doc.data(), uid: doc.id } as Transaction,
+        status: 'RESOLVE'
+      }))
+      .catch(() => ({
+        transaction: null,
+        status: 'REJECT'
+      }))
+
+    let status = response.status;
+
+    if(status === 'RESOLVE') {
+      const balanceAdapter = new BalanceAdapter();
+
+      await balanceAdapter.updateMyBalance(type, Number(centValue));
+    }
+
+    if(status === 'REJECT' || !response.transaction)
+      throw new Error('Transação não adicionada');
+
+    return new Transaction(response.transaction);
+  }
+
+  async UploadImages(images: string[]) {
+    const userAdapter = new UserAdapter();
+
+    const currentUser = await userAdapter.getAuthUser();
+
+    const fetchImages = images.map(async uri => {
+      const image = await fetch(uri);
+      const blobImage = await image.blob();
+
+      return blobImage;
+    })
+
+    const resolvedImages = await Promise.all(fetchImages);
+
+    const storageRef = firebase
+      .storage()
+      .ref(`/transactions/${currentUser.uid}/`);
+
+    const imagesURIs = resolvedImages.map(async singleImage => {
+      return storageRef
+        .child(Date.now().toString())
+        .put(singleImage)
+        .then(reference => reference.ref.getDownloadURL());
+    })
+
+    const URIs = await Promise.all(imagesURIs);
+
+    return URIs;
   }
 }
