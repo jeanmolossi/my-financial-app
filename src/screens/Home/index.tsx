@@ -7,7 +7,7 @@ import { Transaction } from 'financial-core';
 
 import { AppContainer, Button, Text } from '../../components';
 import { useAuth } from '../../hooks/Auth';
-import { getMyLastBalance, subscribeTransactions } from '../../repositories';
+import { getMyLastBalance, subscribeTransactions, subscribeMyBalance } from '../../repositories';
 import CreateCategoryModal, { CreateCategoryModalRef } from './CreateCategoryModal';
 
 import {
@@ -47,27 +47,17 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-
     const unsubscribeTransactions = subscribeTransactions(setTransactions)
         .then(unsubcribeCallback => unsubcribeCallback);
 
-    handleLoadBalance()
+    const unsubscribeBalance = subscribeMyBalance(setBalance)
+      .then(unsubscribeCallback => unsubscribeCallback);
 
-    // const unsubscribeBalance = firebase
-    //   .firestore()
-    //   .collection(`users/${user.uid}/balance`)
-    //   .orderBy('created_at', 'desc')
-    //   .onSnapshot(snapshot => {
-    //     snapshot.docChanges().forEach(change => {
-    //       if(change) {
-    //         handleLoadBalance()
-    //       }
-    //     })
-    //   })
+    handleLoadBalance()
 
     return () => {
       unsubscribeTransactions.then(unsub => unsub());
-      // unsubscribeBalance();
+      unsubscribeBalance.then(unsub => unsub());
     }
   }, []);
   

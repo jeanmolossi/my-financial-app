@@ -3,8 +3,6 @@ import { Form } from '@unform/mobile';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AppContainer, Button, Input } from '../../components';
 import { getMyLastBalance, adjustMyBalance } from '../../repositories';
-import { parseToCurrency } from '../../utils';
-
 
 const Settings: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
@@ -24,7 +22,7 @@ const Settings: React.FC = () => {
         return;
       }
 
-      setBalance(parseToCurrency(response.balance.balance.toString()));
+      setBalance(response.balance.toString());
     })
   }, []);
 
