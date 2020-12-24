@@ -9,7 +9,6 @@
     "eject": "expo eject"
   },
   "dependencies": {
-    "financial-core": "file:core",
     "@expo-google-fonts/montserrat": "^0.1.0",
     "@expo-google-fonts/quicksand": "^0.1.0",
     "@expo-google-fonts/raleway": "^0.1.0",
@@ -30,7 +29,7 @@
     "expo-image-manipulator": "~8.4.0",
     "expo-linear-gradient": "~8.4.0",
     "expo-status-bar": "~1.0.3",
-    "firebase": "^8.2.0",
+    "financial-core": "file:core",
     "react": "16.13.1",
     "react-dom": "16.13.1",
     "react-native": "https://github.com/expo/react-native/archive/sdk-40.0.1.tar.gz",
