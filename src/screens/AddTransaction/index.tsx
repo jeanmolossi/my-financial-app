@@ -8,7 +8,7 @@ import { Dimensions, Modal, View } from 'react-native';
 import { FormHandles } from '@unform/core';
 import { RequestStatus, UpdateRequestStatus, useAppContext } from '../../store/app';
 import { AppContainer, Button, Input, Camera } from '../../components';
-import { getMyCategories, addNewTransaction } from '../../repositories';
+import { getMyCategories, addNewTransaction, subscribeMyCategories } from '../../repositories';
 import { useAuth } from '../../hooks/Auth';
 import { SelectContainer } from './styles';
 
@@ -65,23 +65,12 @@ const AddTransaction: React.FC = () => {
   }, [selectedType, selectedCategory, picture, dispatch]);
 
   useEffect(() => {
-    const unsubscribe = firebase
-      .firestore()
-      .collection(`users/${user.uid}/categories`)
-      .onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if(change.type === 'added') {
-            getMyCategories().then(({ categories }) => {
-              setCategories(categories);
-              if(categories.length > 0)
-                setSelectedCategory(categories[0].uid)
-            })
-          }
-        })
-      });
+    const unsubscribe = subscribeMyCategories(setCategories)
+      .then(unsubscribeCallback => unsubscribeCallback);
+    
       
     return () => {
-      unsubscribe();
+      unsubscribe.then(unsub => unsub());
     }
   }, []);
 

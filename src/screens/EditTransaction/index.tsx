@@ -1,23 +1,19 @@
-import { ActivityIndicator, Dimensions, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import { FormHandles } from '@unform/core';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { Modalize } from 'react-native-modalize';
-import firebase from 'firebase/app';
-import 'firebase/firestore';
 
 import { AppContainer, Button, Input, Text } from '../../components';
-import { getMyCategories, addNewTransaction } from '../../repositories';
+import { addNewTransaction, subscribeMyCategories } from '../../repositories';
 import { RequestStatus, UpdateRequestStatus, useAppContext } from '../../store/app';
-import { useAuth } from '../../hooks/Auth';
 import { SelectContainer } from './styles';
 
 const { height } = Dimensions.get('screen');
 
 const EditTransaction: React.FC = () => {
-  const { user } = useAuth();
   const formRef = useRef<FormHandles>(null);
   const { app: { status }, dispatch } = useAppContext();
   const { navigate, reset } = useNavigation();
@@ -66,23 +62,11 @@ const EditTransaction: React.FC = () => {
   }, [selectedType, selectedCategory, dispatch]);
 
   useEffect(() => {
-    const unsubscribe = firebase
-      .firestore()
-      .collection(`users/${user.uid}/categories`)
-      .onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-          if(change.type === 'added') {
-            getMyCategories().then(({ categories }) => {
-              setCategories(categories);
-              if(categories.length > 0)
-                setSelectedCategory(categories[0].uid)
-            })
-          }
-        })
-      });
+    const unsubscribe = subscribeMyCategories(setCategories)
+      .then(unsubscribeCallback => unsubscribeCallback);
       
     return () => {
-      unsubscribe();
+      unsubscribe.then(unsub => unsub());
     }
   }, []);
 

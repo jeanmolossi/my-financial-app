@@ -1,60 +1,21 @@
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/firestore';
-import { getAuthUser } from './userRepository';
+import { Category, CategoryAdapter } from 'financial-core';
 
 export async function createCategory(categoryName: string) {
-  const user = await getAuthUser();
+  const categoryAdapter = new CategoryAdapter();
 
-  if(!user){
-    return {
-      category: null,
-      status: 'REJECT'
-    }
-  }
-
-  return firebase
-    .firestore()
-    .collection(`users`)
-    .doc(user.uid)
-    .collection('categories')
-    .add({ categoryName })
-    .then(response => response.get())
-    .then(doc => ({
-      category: {
-        ...doc.data(),
-        uid: doc.id
-      },
-      status: 'RESOLVE'
-    }))
-    .catch(() => ({
-      category: null,
-      status: 'REJECT'
-    }))
+  return categoryAdapter.createCategory(categoryName);
 }
 
 export async function getMyCategories(){
-  const user = await getAuthUser();
+  const categoryAdapter = new CategoryAdapter();
 
-  if(!user){
-    return {
-      categories: [],
-      status: 'REJECT'
-    };
-  }
+  return categoryAdapter.getMyCategories();
+}
 
-  return firebase
-    .firestore()
-    .collection('users')
-    .doc(user.uid)
-    .collection('categories')
-    .get()
-    .then(response => ({
-      categories: response.docs.map(doc => ({ ...doc.data(), uid: doc.id })),
-      status: 'RESOLVE'    
-    }))
-    .catch(() => ({
-      categories: [],
-      status: 'REJECT'
-    }))
+export async function subscribeMyCategories(
+  callback: (categories: Category[]) => void
+) {
+  const categoryAdapter = new CategoryAdapter();
+
+  return categoryAdapter.subscribeMyCategories(callback);
 }
