@@ -1,6 +1,10 @@
-import { Category } from "../entities";
-import { CreateCategoryService, GetMyCategoriesService, SubscribeMyCategoriesService } from "../services/category";
-import { CreateCategoryInteractor, GetMyCategoriesInteractor, SubscribeMyCategoriesInteractor } from "../useCases";
+import { Category } from "../entities/Category";
+import { CreateCategoryService } from "../services/category/CreateCategoryService";
+import { GetMyCategoriesService } from "../services/category/GetMyCategoriesService";
+import { SubscribeMyCategoriesService } from "../services/category/SubscribeMyCategoriesService";
+import { CreateCategoryInteractor } from "../useCases/category/CreateCategoryService";
+import { GetMyCategoriesInteractor } from "../useCases/category/GetMyCategoriesService";
+import { SubscribeMyCategoriesInteractor } from "../useCases/category/SubscribeMyCategoriesService";
 
 export class CategoryAdapter {
   async createCategory(name: string): Promise<Category> {

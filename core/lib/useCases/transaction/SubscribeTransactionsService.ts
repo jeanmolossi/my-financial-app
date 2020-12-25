@@ -1,5 +1,4 @@
-import { Transaction } from "../../entities";
-
+import { Transaction } from "../../entities/Transaction";
 
 export interface SubscribeTransactionsServiceModel {
   subscribeTransactions: (callback: (transactions: Transaction[]) => void) => Promise<() => void>

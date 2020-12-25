@@ -1,6 +1,5 @@
-import { Transaction } from "../../entities";
-import { GetAuthServiceModel } from "../auth";
-import { GetUserServiceModel } from "../user";
+import { Transaction } from "../../entities/Transaction";
+import { GetAuthServiceModel } from "../auth/GetAuth";
 
 export interface GetMyTransactionsServiceModel {
   getMyTransactions: (userId: string) => Promise<Transaction[]>

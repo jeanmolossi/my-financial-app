@@ -1,6 +1,8 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
-import { Credentials, User } from "../../entities";
+
+import { User } from "../../entities/User";
+import { Credentials } from "../../entities/Credentials";
 
 export class UserRepository {
   private attemps = 3;
@@ -65,14 +67,11 @@ export class UserRepository {
         const user = firebase.auth().currentUser;
 
         if(user && this.attemps >= 0) {
-          console.log('RESOLVE', this.attemps)
           clearTimeout(timeout);
           resolve(user as User);
         } else if (!user && this.attemps >= 0) {          
-          console.log('TRY AGAIN', this.attemps)
           await this.getAuthUser();
         } else {
-          console.log('FAIL')
           reject('Usuário não logado')
         }
       }, 1000);
@@ -91,7 +90,6 @@ export class UserRepository {
     if(!email) {
       throw new Error('Usuário cadastrado sem e-mail!')
     }
-    console.log('RETURNS USER')
     return new User({ uid, email })
   }
 

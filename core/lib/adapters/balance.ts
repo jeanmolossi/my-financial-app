@@ -1,15 +1,12 @@
-import { Balance } from "../entities";
-import { GetMyLastBalanceService,
-  UpdateMyBalanceService,
-  AdjustMyBalanceService,
-  SubscribeMyBalanceService
-} from "../services";
-import {
-  AdjustMyBalanceInteractor,
-  GetMyLastBalanceInteractor,
-  SubscribeMyBalanceInteractor,
-  UpdateMyBalanceInteractor
-} from "../useCases";
+import { Balance } from "../entities/Balance";
+import { AdjustMyBalanceService } from "../services/balance/AdjustMyBalanceService";
+import { GetMyLastBalanceService } from "../services/balance/GetMyLastBalanceService";
+import { SubscribeMyBalanceService } from "../services/balance/SubscribeMyBalanceService";
+import { UpdateMyBalanceService } from "../services/balance/UpdateMyBalanceService";
+import { AdjustMyBalanceInteractor } from "../useCases/balance/AdjustMyBalanceService";
+import { GetMyLastBalanceInteractor } from "../useCases/balance/GetMyLastBalanceService";
+import { SubscribeMyBalanceInteractor } from "../useCases/balance/SubscribeMyBalanceService";
+import { UpdateMyBalanceInteractor } from "../useCases/balance/UpdateMyBalanceService";
 
 export class BalanceAdapter {
   async getMyLastBalance(): Promise<Balance> {

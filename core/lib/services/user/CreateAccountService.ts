@@ -1,6 +1,7 @@
-import { Credentials, User } from '../../entities';
-import { UserRepository } from '../../frameworks';
-import { CreateAccountServiceModel } from '../../useCases';
+import { User } from '../../entities/User';
+import { Credentials } from '../../entities/Credentials';
+import { UserRepository } from '../../frameworks/firebase/user_repository';
+import { CreateAccountServiceModel } from '../../useCases/user/CreateAccountService';
 
 export class CreateAccountService implements CreateAccountServiceModel {
   async createAccount(credentials: Credentials): Promise<User> {

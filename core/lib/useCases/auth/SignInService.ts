@@ -1,4 +1,5 @@
-import { User, Credentials } from "../../entities";
+import { User } from "../../entities/User";
+import { Credentials } from "../../entities/Credentials";
 
 export interface SignInServiceModel {
   signInWithEmailAndPassword: ({ email, password }: Credentials) => Promise<User>;

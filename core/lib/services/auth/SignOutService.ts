@@ -1,5 +1,5 @@
-import { UserRepository } from "../../frameworks";
-import { SignOutServiceModel } from "../../useCases";
+import { UserRepository } from "../../frameworks/firebase/user_repository";
+import { SignOutServiceModel } from "../../useCases/auth/SignOutService";
 
 export class SignOutService implements SignOutServiceModel {
   async signOut(): Promise<void> {

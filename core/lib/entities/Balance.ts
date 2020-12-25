@@ -18,5 +18,15 @@ export class Balance {
     this.balance = parseToCurrency(balance);
     this.calc = calc;
     this.created_at = new Date();
+
+    return this;
+  }
+
+  static new(payload: BalanceModel) {
+    const balance = new Balance(payload);
+    return {
+      ...balance,
+      balance: Number(balance.balance)
+    }
   }
 }

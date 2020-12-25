@@ -1,6 +1,6 @@
-import { User } from "../../entities";
-import { UserRepository } from "../../frameworks";
-import { GetUserServiceModel } from "../../useCases";
+import { User } from "../../entities/User";
+import { UserRepository } from "../../frameworks/firebase/user_repository";
+import { GetUserServiceModel } from "../../useCases/user/GetUserService";
 
 export class GetUserService implements GetUserServiceModel {
 

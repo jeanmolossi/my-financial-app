@@ -1,9 +1,12 @@
 import firebase  from 'firebase/app';
 import 'firebase/firestore';
-import { BalanceAdapter, UserAdapter } from '../../adapters';
-import { Transaction } from "../../entities";
+
+import { BalanceAdapter } from '../../adapters/balance';
+import { UserAdapter } from '../../adapters/user';
+import { Transaction } from '../../entities/Transaction';
 import { TransactionPayload } from '../../useCases/transaction/AddNewTransactionService';
 import { parseCurrencyInputToNumber, parseToCurrency } from '../../utils';
+
 
 export interface DocTransaction {
   uid: string;
@@ -149,7 +152,7 @@ export class TransactionsRepository {
         status: 'REJECT'
       }))
 
-    let status = response.status;
+    const { status, transaction } = response;
 
     if(status === 'RESOLVE') {
       const balanceAdapter = new BalanceAdapter();
@@ -157,38 +160,33 @@ export class TransactionsRepository {
       await balanceAdapter.updateMyBalance(type, Number(centValue));
     }
 
-    if(status === 'REJECT' || !response.transaction)
+    if(status === 'REJECT' || !transaction)
       throw new Error('Transação não adicionada');
 
-    return new Transaction(response.transaction);
+    return new Transaction(transaction);
   }
 
-  async UploadImages(images: string[]) {
+  async UploadImages(images: Blob[]): Promise<string[]> {
+    if(images.length <= 0)
+      return [];
+
     const userAdapter = new UserAdapter();
 
     const currentUser = await userAdapter.getAuthUser();
 
-    const fetchImages = images.map(async uri => {
-      const image = await fetch(uri);
-      const blobImage = await image.blob();
-
-      return blobImage;
-    })
-
-    const resolvedImages = await Promise.all(fetchImages);
-
     const storageRef = firebase
       .storage()
-      .ref(`/transactions/${currentUser.uid}/`);
+      .ref(`/transactions/user-${currentUser.uid}/`);
 
-    const imagesURIs = resolvedImages.map(async singleImage => {
-      return storageRef
+    const imagesURIs: Promise<string>[] = images.map(async singleImage => 
+      storageRef
         .child(Date.now().toString())
         .put(singleImage)
-        .then(reference => reference.ref.getDownloadURL());
-    })
+        .then(reference => reference.ref.getDownloadURL()));    
 
     const URIs = await Promise.all(imagesURIs);
+
+    console.log('URIS', URIs)
 
     return URIs;
   }

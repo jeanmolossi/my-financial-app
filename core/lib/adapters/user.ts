@@ -1,8 +1,18 @@
-import { Credentials, User } from '../entities';
-import { SignInService, CreateAccountService, GetAuthService, OnAuthStateChangedService } from '../services';
-import { SignOutService } from '../services/auth/SignOutService';
+import { User } from '../entities/User';
+import { Credentials } from '../entities/Credentials';
+import { SignInService } from '../services/auth/SignInService';
+import { CreateAccountService } from '../services/user/CreateAccountService';
+import { OnAuthStateChangedService } from '../services/auth/OnAuthStateChangedService';
 import { GetUserService } from '../services/user/GetUserService';
-import { CreateAccountInteractor, GetAuthInteractor, GetUserInteractor, OnAuthStateChangedInteractor, SignInInteractor, SignOutInteractor } from '../useCases';
+import { CreateAccountInteractor } from '../useCases/user/CreateAccountService';
+import { GetUserInteractor } from '../useCases/user/GetUserService';
+
+import { GetAuthService } from '../services/auth/GetAuthService';
+import { SignOutService } from '../services/auth/SignOutService';
+import { GetAuthInteractor } from '../useCases/auth/GetAuth';
+import { OnAuthStateChangedInteractor } from '../useCases/auth/OnAuthStateChanged';
+import { SignInInteractor } from '../useCases/auth/SignInService';
+import { SignOutInteractor } from '../useCases/auth/SignOutService';
 
 export class UserAdapter {
 

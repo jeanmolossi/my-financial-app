@@ -1,10 +1,9 @@
 import firebase from 'firebase/app';
 import 'firebase/auth';
 import 'firebase/firestore';
-import { stat } from 'fs';
 
-import { UserAdapter } from "../../adapters";
-import { Category } from '../../entities';
+import { UserAdapter } from "../../adapters/user";
+import { Category } from '../../entities/Category';
 
 export class CategoryRepository {
   async createCategory(name: string) {

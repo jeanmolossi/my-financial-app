@@ -1,6 +1,7 @@
-import { Credentials, User } from '../../entities';
-import { UserRepository } from '../../frameworks';
-import { SignInServiceModel } from '../../useCases';
+import { User } from '../../entities/User';
+import { Credentials } from '../../entities/Credentials';
+import { UserRepository } from '../../frameworks/firebase/user_repository';
+import { SignInServiceModel } from '../../useCases/auth/SignInService';
 
 export class SignInService implements SignInServiceModel {  
 

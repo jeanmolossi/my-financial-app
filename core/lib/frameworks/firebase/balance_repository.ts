@@ -1,9 +1,8 @@
 import firebase from "firebase/app";
 import "firebase/firestore";
-import { stat } from "fs";
-import { UserAdapter } from "../../adapters";
 
-import { Balance } from "../../entities";
+import { UserAdapter } from "../../adapters/user";
+import { Balance } from "../../entities/Balance";
 import { parseCurrencyInputToNumber } from "../../utils";
 
 export class BalanceRepository {
@@ -42,9 +41,13 @@ export class BalanceRepository {
     const { balance } = await this
       .getMyLastBalance()
       .then(response => ({ balance: response?.balance }));
-  
-    const newBalance: number = type === 'income' ? Number(balance) + value : Number(balance) - value;
-  
+
+    const centBalance = parseCurrencyInputToNumber(balance);
+    
+    const newBalance: number = type === 'income'
+    ? Number(centBalance) + value
+    : Number(centBalance) - value;
+    
     const { status, balanceDoc } = await firebase
       .firestore()
       .collection(`users/${user.uid}/balance`)
@@ -56,15 +59,16 @@ export class BalanceRepository {
       .then((doc) => ({ status: 'RESOLVE', balanceDoc: doc.get() }))
       .catch(() => ({ status: 'REJECT', balanceDoc: null }))
 
-    if(status !== 'RESOLVE' || !balanceDoc)
+    if(status === 'REJECT' || !balanceDoc){
       throw new Error('Balance not updated');
-
+    }
+      
     const balanceResponse = await balanceDoc.then(doc => ({
       ...doc.data(),
       uid: doc.id,
-    } as Balance))
+    } as Balance));
 
-    return new Balance({ ...balanceResponse })
+    return balanceResponse;
   }
 
   async adjustMyBalance(value: string) {
@@ -78,7 +82,7 @@ export class BalanceRepository {
       .firestore()
       .collection(`users/${user.uid}/balance`)
       .add({
-        balance,
+        balance: Number(balance),
         calc: 'adjust',
         created_at: new Date()
       })

@@ -1,6 +1,6 @@
-import { Category } from "../../entities";
-import { CategoryRepository } from "../../frameworks";
-import { SubscribeMyCategoriesServiceModel } from "../../useCases";
+import { Category } from "../../entities/Category";
+import { CategoryRepository } from "../../frameworks/firebase/category_repository";
+import { SubscribeMyCategoriesServiceModel } from "../../useCases/category/SubscribeMyCategoriesService";
 
 export class SubscribeMyCategoriesService implements SubscribeMyCategoriesServiceModel {
   async subscribeMyCategories(

@@ -1,11 +1,11 @@
-import { Transaction } from "../../entities";
+import { Transaction } from "../../entities/Transaction";
 
 export interface TransactionPayload {
   value: string;
   type: 'income' | 'outcome';
   category: string;
   identifier: string;
-  images?: string[];
+  images?: Blob[];
 }
 
 export interface AddNewTransactionServiceModel {

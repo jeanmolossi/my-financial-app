@@ -1,4 +1,4 @@
-import { Balance } from "../../entities";
+import { Balance } from "../../entities/Balance";
 
 export interface UpdateMyBalanceServiceModel {
   updateMyBalance: (type: 'income' | 'outcome', value: number) => Promise<Balance>;

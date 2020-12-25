@@ -1,7 +1,10 @@
-import { Transaction } from "../entities";
-import { AddNewTransactionService, GetAuthService, GetMyTransactionsService } from "../services";
+import { Transaction } from "../entities/Transaction";
+import { GetAuthService } from "../services/auth/GetAuthService";
+import { AddNewTransactionService } from "../services/transaction/AddNewTransactionService";
+import { GetMyTransactionsService } from "../services/transaction/GetMyTransactionsService";
 import { SubscribeTransactionsService } from "../services/transaction/SubscribeTransactionsService";
-import { GetMyTransactionsInteractor, SubscribeTransactionsInteractor } from "../useCases";
+import { GetMyTransactionsInteractor } from "../useCases/transaction/GetMyTransactionsService";
+import { SubscribeTransactionsInteractor } from "../useCases/transaction/SubscribeTransactionsService";
 import { AddNewTransactionInteractor, TransactionPayload } from "../useCases/transaction/AddNewTransactionService";
 
 

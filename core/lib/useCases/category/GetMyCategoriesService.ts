@@ -1,4 +1,4 @@
-import { Category } from "../../entities";
+import { Category } from "../../entities/Category";
 
 export interface GetMyCategoriesServiceModel {
   getMyCategories(): Promise<Category[]>;

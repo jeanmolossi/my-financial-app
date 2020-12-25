@@ -1,4 +1,4 @@
-import { User } from "../../entities";
+import { User } from "../../entities/User";
 
 export interface GetAuthServiceModel {
   getAuthUser: () => Promise<User>;

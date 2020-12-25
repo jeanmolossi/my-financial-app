@@ -1,4 +1,4 @@
-import { Balance } from "../../entities";
+import { Balance } from "../../entities/Balance";
 
 export interface AdjustMyBalanceServiceModel {
   adjustMyBalance: (value: string) => Promise<Balance>

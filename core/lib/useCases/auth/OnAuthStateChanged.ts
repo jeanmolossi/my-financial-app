@@ -1,4 +1,4 @@
-import { User } from "../../entities";
+import { User } from "../../entities/User";
 
 export interface OnAuthStateChangedServiceModel {
   onAuthStateChanged: (callback: (user: User) => void) => Promise<void>;

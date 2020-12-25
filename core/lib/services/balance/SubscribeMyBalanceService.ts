@@ -1,5 +1,5 @@
-import { BalanceRepository } from "../../frameworks";
-import { SubscribeMyBalanceServiceModel } from "../../useCases";
+import { BalanceRepository } from "../../frameworks/firebase/balance_repository";
+import { SubscribeMyBalanceServiceModel } from "../../useCases/balance/SubscribeMyBalanceService";
 
 export class SubscribeMyBalanceService implements SubscribeMyBalanceServiceModel {
   async subscribeMyBalance(callback: (balance: string) => void): Promise<() => void> {
