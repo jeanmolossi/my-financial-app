@@ -6,7 +6,6 @@ import { Modalize } from 'react-native-modalize';
 import { Transaction } from 'financial-core';
 
 import { AppContainer, Button, Text } from '../../components';
-import { useAuth } from '../../hooks/Auth';
 import { getMyLastBalance, subscribeTransactions, subscribeMyBalance } from '../../repositories';
 import CreateCategoryModal, { CreateCategoryModalRef } from './CreateCategoryModal';
 
@@ -21,13 +20,13 @@ const { height } = Dimensions.get('screen')
 
 const Home: React.FC = () => {
   const { navigate } = useNavigation();
-  const { user } = useAuth();
-
+  
   const createCategoryModal = useRef<CreateCategoryModalRef>(null);
 
   const [transactions, setTransactions] = useState([] as Transaction[]);
   const [balance, setBalance] = useState('0,00');
   const [loadingBalance, setLoadingBalance] = useState(true);
+  const [showLoading, setShowLoading] = useState(true);
 
   const handleOpenModal = useCallback(() => {
     createCategoryModal.current?.onOpen();
@@ -60,6 +59,14 @@ const Home: React.FC = () => {
       unsubscribeBalance.then(unsub => unsub());
     }
   }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowLoading(false)
+    }, 5000);
+
+    return () => clearTimeout(timeout);
+  }, [])
   
   return (
     <AppContainer>
@@ -128,6 +135,7 @@ const Home: React.FC = () => {
           contentContainerStyle: {
             paddingHorizontal: 16
           },
+          keyExtractor: (item) => item.uid,
           ListHeaderComponent: () => (
             <HistoricContainer>
               <Text size="xl" color="black">Seu Histórico</Text>
@@ -135,7 +143,7 @@ const Home: React.FC = () => {
           ),
           ListEmptyComponent: () => (
             <View style={{ marginVertical: 16, marginHorizontal: 8 }}>
-              <ActivityIndicator size="large" color="dark" style={{ marginBottom: 8 }} />
+              {showLoading && <ActivityIndicator size="large" color="dark" style={{ marginBottom: 8 }} />}
               <Text color="black" size="md" montserrat>Você não possui transações registradas ainda.</Text>
               <Text color="black" size="md" montserrat>Adicione uma categoria acima e em seguida uma transação</Text>
               <View style={{ height: 2, backgroundColor: '#3333', marginVertical: 16 }} />
@@ -153,29 +161,39 @@ const Home: React.FC = () => {
               </Button>
             </View>
           ),
-          keyExtractor: (item) => item.uid,
-          // TODO : CHANGE OF CATEGORYNAME TO NAME
-          renderItem: ({ item: { uid, category: { categoryName, uid: cUid }, type, identifier, value, images } }) => (
-            <HistoricItem key={uid} transactionType={type}>
-              <View style={{ flex: 1 }}>
-                <Text color="black" size="sm">{identifier}</Text>
-                <Text color="black" size="md">R$ {value}</Text>
-                <Text color="#333">{categoryName}</Text>
-              </View>
-              <Button
-                variant="outline_green"
-                size="sm"
-                onPress={() => navigate('EditTransaction', { transaction: { uid, category: { uid: cUid, categoryName }, type, identifier, value, images } })}
-              >
-                <Feather name="edit" size={20}/>
-              </Button>
-              {images.length > 0 ? (
-                <Button variant="purple">
-                  <Feather name="image" size={20} />
-                </Button>
-              ) : <View />}
-            </HistoricItem>
-          ),
+          renderItem: ({ item }: { item: Transaction }) => {
+            const {
+              uid,
+              category: {
+                name,
+              },
+              type,
+              identifier,
+              value,
+              images
+            } = item;
+
+            return (
+              <HistoricItem key={uid} transactionType={type}>
+                <View style={{ flex: 1 }}>
+                  <Text color="black" size="sm">{identifier}</Text>
+                  <Text color="black" size="md">R$ {value}</Text>
+                  <Text color="#333">{name}</Text>
+                </View>
+                {images.length > 0 ? (
+                  <Button
+                    variant="purple"
+                    key={uid}
+                    onPress={() => {
+                      navigate('Coupons', { images, transaction: item })
+                    }}
+                  >
+                    <Feather name="image" size={20} />
+                  </Button>
+                ) : <View />}
+              </HistoricItem>
+            );
+          },
         }}
       />
 
