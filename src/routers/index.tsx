@@ -5,8 +5,8 @@ import { UserAdapter } from 'financial-core';
 
 import AuthTabs from './Auth';
 import { getAuthUser } from '../repositories';
-import { Home, Welcome } from '../screens';
-import { useAuth, User } from '../hooks/Auth';
+import { Welcome } from '../screens';
+import { useAuth } from '../hooks/Auth';
 
 const Stack = createStackNavigator();
 

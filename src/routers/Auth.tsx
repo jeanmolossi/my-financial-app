@@ -1,12 +1,15 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { getFocusedRouteNameFromRoute, getStateFromPath, useNavigationState } from '@react-navigation/native';
 import React from 'react';
-import { View } from 'react-native';
 import { enableScreens } from 'react-native-screens';
 
-import { Button, Tab, Text } from '../components';
+import { Button } from '../components';
 import { useAuth } from '../hooks/Auth';
-import { AddTransaction, EditTransaction, Home, Settings } from '../screens';
+import {
+  Home,
+  AddTransaction,
+  Settings,
+  Coupons,
+} from '../screens';
 
 const { Navigator, Screen } = createDrawerNavigator(); 
 enableScreens();
@@ -64,18 +67,22 @@ const AuthTabs: React.FC = () => {
       />
 
       <Screen
-        name="EditTransaction"
-        component={EditTransaction}
+        name="Coupons"
+        getComponent={() => Coupons}
+        initialParams={{ images: [] }}
         options={{
-          drawerLabel: 'Editar transação',
+          drawerLabel: 'Ver notas',
+          unmountOnBlur: true
         }}
       />
 
       <Screen
         name="Settings"
         component={Settings}
+        initialParams={{ images: [] }}
         options={{
-          drawerLabel: 'Configurações'
+          drawerLabel: 'Configurações',
+          unmountOnBlur: true
         }}
       />
     </Navigator>
