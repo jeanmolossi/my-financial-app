@@ -6,6 +6,8 @@ import { SubscribeTransactionsService } from "../services/transaction/SubscribeT
 import { GetMyTransactionsInteractor } from "../useCases/transaction/GetMyTransactionsService";
 import { SubscribeTransactionsInteractor } from "../useCases/transaction/SubscribeTransactionsService";
 import { AddNewTransactionInteractor, TransactionPayload } from "../useCases/transaction/AddNewTransactionService";
+import { GetTransactionCouponsService } from "../services";
+import { GetTransactionsCouponsInteractor } from "../useCases";
 
 
 export class TransactionAdapter {
@@ -32,5 +34,12 @@ export class TransactionAdapter {
     const interactor = new AddNewTransactionInteractor(service);
 
     return interactor.addNewTransaction(payload)
+  }
+
+  async getTransactionsCoupons(): Promise<string[]> {
+    const service = new GetTransactionCouponsService();
+    const interactor = new GetTransactionsCouponsInteractor(service);
+
+    return interactor.getTransactionsCoupons();
   }
 }

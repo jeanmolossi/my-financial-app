@@ -1,5 +1,6 @@
 import firebase  from 'firebase/app';
 import 'firebase/firestore';
+import 'firebase/storage';
 
 import { BalanceAdapter } from '../../adapters/balance';
 import { UserAdapter } from '../../adapters/user';
@@ -171,7 +172,7 @@ export class TransactionsRepository {
       return [];
 
     const userAdapter = new UserAdapter();
-
+    
     const currentUser = await userAdapter.getAuthUser();
 
     const storageRef = firebase
@@ -186,8 +187,27 @@ export class TransactionsRepository {
 
     const URIs = await Promise.all(imagesURIs);
 
-    console.log('URIS', URIs)
-
     return URIs;
+  }
+
+  async getTransactionsCoupons(): Promise<string[]> {
+    const userAdapter = new UserAdapter();
+
+    const user = await userAdapter.getAuthUser();
+
+    const transactionsImages = await firebase
+      .firestore()
+      .collection(`users/${user.uid}/transactions`)
+      .get()
+      .then(docsSnapshot => 
+        docsSnapshot.docs.map(
+          doc => doc.data().images as string[]
+        )        
+      )
+      .then(images =>
+        images.map(imagesArray => imagesArray[0])
+      )
+
+    return transactionsImages.filter(images => images);
   }
 }
