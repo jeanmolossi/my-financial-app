@@ -15,14 +15,13 @@ export async function addNewTransaction({
     type,
     value,
     images
-  })
+  });
 }
 
 export async function getMyTransactions() {
   const transactionAdapter = new TransactionAdapter();
 
-  const transactions = transactionAdapter.getMyTransactions();
-  return transactions;
+  return transactionAdapter.getMyTransactions();
 }
 
 export async function subscribeTransactions(callback: (transactions: Transaction[]) => void) {
