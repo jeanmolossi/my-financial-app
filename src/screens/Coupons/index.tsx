@@ -1,19 +1,19 @@
 import { useNavigation, useRoute } from '@react-navigation/native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Dimensions, StyleSheet, View, Animated, Text } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Dimensions, StyleSheet, View, Animated, Text, Platform } from 'react-native';
 import { Transaction, TransactionAdapter } from 'financial-core';
 import { Image } from '../../components';
 import { ThemeColors } from '../../assets/theme-colors';
-import { Zocial } from '@expo/vector-icons';
 
 type RouteParams = {
   images: string[];
   transaction: Transaction;
 } | undefined;
 
-const { width } = Dimensions.get('screen');
-const PERSPECTIVE = 600;
-const ANGLE = Math.atan(PERSPECTIVE / width / 2);
+const { width } = Dimensions.get('window');
+const PERSPECTIVE = width + 5;
+const ANGLE = Math.atan(PERSPECTIVE / (width / 2));
+const RATIO = Platform.OS === 'ios' ? 2 : 1.2;
 
 const Coupons: React.FC = () => {
   const { setParams } = useNavigation();
@@ -53,8 +53,7 @@ const Coupons: React.FC = () => {
     
     const translateX = x.interpolate({
       inputRange,
-      outputRange: [width/2, -width/2],
-      extrapolate: 'clamp'
+      outputRange: [width/RATIO, -width/RATIO],
     });
 
     const rotateY = x.interpolate({
@@ -66,15 +65,18 @@ const Coupons: React.FC = () => {
     const translateX1 = x.interpolate({
       inputRange,
       outputRange: [width/2, -width/2],
-      extrapolate: 'clamp'
     });
 
-    const extra = width / 2 / Math.cos(ANGLE / 2) - width / 2;
+    const extra = width / RATIO / Math.cos(ANGLE / 2) - width / RATIO;
 
     const translateX2 = x.interpolate({
       inputRange,
       outputRange: [-extra, extra],
-      extrapolate: 'clamp'
+    })
+
+    const translateX3 = x.interpolate({
+      inputRange,
+      outputRange: [width/1.2,-width/1.2]
     })
 
     // const rotateY_value = rotateY.__getValue();
