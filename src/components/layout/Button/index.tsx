@@ -48,6 +48,32 @@ const Button = ({
     }
   }, [onPress, disabled])
 
+  const ActivityMemoIndicator = useMemo(() => (
+    <ActivityIndicator
+      size={iconSize}
+      color={iconColor}
+      style={{ marginRight: 6 }}
+    />
+  ), [iconSize]);
+
+  const MemoButtonText = useMemo(() => (
+    <ButtonText
+      style={textStyle}
+      {...{ variant, size }}
+    >
+      {children}
+    </ButtonText>
+  ), [textStyle, variant, size, children])
+
+  const MemoFeatherIcon = useMemo(() => (
+    <Feather
+      name={icon || 'alert-octagon' as Icons}
+      size={iconSize}
+      color={iconColor}
+      style={{ marginRight: 6 }}
+    />
+  ), [icon, iconSize, iconColor])
+
   return (
     <>
       {!variant || variant === 'purple' || variant === 'green' ? (
@@ -57,14 +83,10 @@ const Button = ({
         >
           {delete rest.style}
           <ButtonContainer {...{ variant, size, onPress: handlePress }} {...rest}>
-            {icon && !disabled && <Feather name={icon} size={iconSize} color={iconColor} style={{ marginRight: 6 }} />}
-            {disabled ? (
-              <>
-                <ActivityIndicator size={iconSize} color="white" style={{ marginRight: 6 }} />
-              </>
-            ) : (              
-              <ButtonText style={textStyle} {...{ variant, size }}>{children}</ButtonText>
-            )}
+            {icon && !disabled && MemoFeatherIcon}
+            {disabled
+              ? ActivityMemoIndicator
+              : MemoButtonText}
             
           </ButtonContainer>
         </BackgroundGradient>
@@ -72,15 +94,19 @@ const Button = ({
         <BorderView {...{ variant, size, style: rest.style }}>
           {delete rest.style}
           <ButtonContainer {...{ variant, size, disabled, onPress: handlePress }} {...rest}>
-            {icon && !disabled && <Feather name={icon} size={iconSize} color={iconColor} style={{ marginRight: 6 }} />}
-            {disabled ? (
+            {icon && !disabled && MemoFeatherIcon}
+            {disabled
+              ? (
               <>
-                <ActivityIndicator size={iconSize} color="white" style={{ marginRight: 6 }} />
-                <ButtonText style={textStyle} {...{ variant, size }}>Carregando...</ButtonText>
+                {ActivityMemoIndicator}
+                <ButtonText
+                  style={textStyle}
+                  {...{ variant, size }}
+                >
+                  Carregando...
+                </ButtonText>
               </>
-            ) : (
-              <ButtonText style={textStyle} {...{ variant, size }}>{children}</ButtonText>
-            )}
+            ) : MemoButtonText}
           </ButtonContainer>
         </BorderView>
       )}      

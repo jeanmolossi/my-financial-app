@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Camera, CameraCapturedPicture } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import { Image, TouchableOpacity, View, Dimensions, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
@@ -10,8 +10,8 @@ import { Text, CameraAction, ActionButtonsContainer } from './styles';
 interface CameraComponentProps {
   onCameraReady?: () => void;
   onTakePicture?: () => void;
-  onTakePictureEnds?: (pic: CameraCapturedPicture) => void;
-  onSave?: (pic: CameraCapturedPicture) => void;
+  onTakePictureEnds?: (pic: Blob) => void;
+  onSave?: (pic: Blob) => void;
   onDiscard?: () => void;
 }
 
@@ -29,48 +29,56 @@ const CameraComponent = ({
   const [takingPic, setTakingPic] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
   const [image, setImage] = useState('');
-  const [picture, setPicture] = useState({} as CameraCapturedPicture)
 
-  const handleCapture = useCallback(() => {
+  const handleCapture = useCallback(async () => {
     setTakingPic(true);
     if(onTakePicture) onTakePicture();
 
     if(ready){
-      camRef.current
+      const uri = await camRef.current
         ?.takePictureAsync()
-        .then(async response => {
-          const { uri } = response;
-
-          const imageResult = await ImageManipulator.manipulateAsync(
-            uri,
-            [{ resize: { height: 1080, width: 1080 } }],
-            { compress: 0.7 }
-          )
-
-          console.log('IMAGE RESULT', imageResult)
-
-          setImage(imageResult.uri);
-          setPicture(imageResult);
-          setTakingPic(false);
-
-          if( onTakePictureEnds ) onTakePictureEnds(imageResult)
-        })
+        .then(({ uri }) => uri)
         .catch(() => {
           setTakingPic(false);
         });
+        
+      if(!uri){
+        console.log('Empty uri')
+
+        setTakingPic(false);
+        return;
+      }
+      
+      const imageResult = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { height: 1080, width: 1080 } }],
+        { compress: 0.7 }
+      )
+
+      const blob = await fetch(imageResult.uri)
+        .then(response => response)
+        .then(response => response.blob());
+
+      setImage(imageResult.uri);
+
+      if( onTakePictureEnds && blob ) onTakePictureEnds(blob)
+      
+      setTakingPic(false);
     }
   }, [ready, onTakePictureEnds, onTakePicture]);
 
-  const handleSave = useCallback(() => {
-    if(onSave) onSave(picture);
+  const handleSave = useCallback(async () => {
+    const blobPicture = await fetch(image)
+      .then(response => response)
+      .then(response => response.blob())
+
+    if(onSave && blobPicture) onSave(blobPicture);
 
     setImage('')
-  }, [onSave, picture]);
+  }, [onSave, image]);
   
   const handleDiscard = useCallback(() => {
     if(onDiscard) onDiscard();
-
-    console.log('DISCARD')
 
     setImage('')
   }, [onDiscard]);
@@ -81,22 +89,31 @@ const CameraComponent = ({
   }, []);
 
   useEffect(() => {
-    (async () => {
+    const requestPermissions = async () => {
       const { status } = await Camera.requestPermissionsAsync();
+      
       setHasPermission(status === 'granted')
-    })()
+    };
+
+    requestPermissions();
+
+    return () => {
+      // UNMOUNT COMPONENT
+    }
   }, []);
 
   return (
-    <>
+    <View style={{ flex: 1, position: 'relative', backgroundColor: ThemeColors.darkShade[100] }}>
       {!image && hasPermission && (
-        <Camera
-          ref={camRef}
-          onCameraReady={onCameraReady}
-          pictureSize="1:1"
-          ratio="1/1"
-          style={{ flex: 1, position: 'relative' }}
-        >
+        <>
+          <Camera
+            ref={camRef}
+            onCameraReady={onCameraReady}
+            ratio={'1:1'}
+            style={{ width, height: width }}
+            useCamera2Api={false}
+          />
+
           <TouchableOpacity
             onPress={() => {
               if(!takingPic)
@@ -122,7 +139,7 @@ const CameraComponent = ({
           >
             {takingPic && <ActivityIndicator size={30} color="black" />}
           </TouchableOpacity>
-        </Camera>
+        </>
       )}
 
       {!!image && (
@@ -149,7 +166,7 @@ const CameraComponent = ({
 
         </View>
       )}
-    </>
+    </View>
   );
 }
 

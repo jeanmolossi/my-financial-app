@@ -6,3 +6,4 @@ export { default as Input } from './shared/Input';
 export { default as Tab } from './layout/Tab';
 
 export { default as Camera } from './shared/Camera';
+export { default as Image } from './shared/Image';
