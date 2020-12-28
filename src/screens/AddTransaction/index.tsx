@@ -1,21 +1,19 @@
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { Form } from '@unform/mobile';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Picker } from '@react-native-picker/picker';
 import { Modalize } from 'react-native-modalize';
-import firebase from 'firebase';
 import { Dimensions, Modal, View } from 'react-native';
 import { FormHandles } from '@unform/core';
 import { RequestStatus, UpdateRequestStatus, useAppContext } from '../../store/app';
 import { AppContainer, Button, Input, Camera } from '../../components';
 import { getMyCategories, addNewTransaction, subscribeMyCategories } from '../../repositories';
-import { useAuth } from '../../hooks/Auth';
 import { SelectContainer } from './styles';
+import { Category } from 'financial-core';
 
 const { height } = Dimensions.get('screen');
 
 const AddTransaction: React.FC = () => {
-  const { user } = useAuth();
   const formRef = useRef<FormHandles>(null);
   const { app: { status }, dispatch } = useAppContext();
   const { navigate, reset } = useNavigation();
@@ -24,9 +22,9 @@ const AddTransaction: React.FC = () => {
   const { type } = params as { type: 'income' | 'outcome' } || { type: 'income' };
 
   const [selectedType, setSelectedType] = useState(type || 'income');
-  const [categories, setCategories] = useState([] as any[]);
+  const [categories, setCategories] = useState([] as Category[]);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [picture, setPicture] = useState('');
+  const [picture, setPicture] = useState({} as Blob);
   
   const [cameraVisible, setCameraVisible] = useState(false);
 
@@ -37,7 +35,7 @@ const AddTransaction: React.FC = () => {
         message: 'Adicionando transação...'
       })
     )
-    
+
     addNewTransaction({
       value,
       identifier,
@@ -65,14 +63,21 @@ const AddTransaction: React.FC = () => {
   }, [selectedType, selectedCategory, picture, dispatch]);
 
   useEffect(() => {
-    const unsubscribe = subscribeMyCategories(setCategories)
-      .then(unsubscribeCallback => unsubscribeCallback);
-    
-      
-    return () => {
-      unsubscribe.then(unsub => unsub());
+    if(categories.length>0){
+      setSelectedCategory(categories[0].uid)
     }
-  }, []);
+  }, [categories]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = subscribeMyCategories(setCategories)
+        .then(unsubscribeCallback => unsubscribeCallback);    
+        
+      return () => {
+        unsubscribe.then(unsub => unsub());
+      }
+    }, [])
+  );
 
 
   return (
@@ -133,11 +138,17 @@ const AddTransaction: React.FC = () => {
                 setSelectedCategory(itemValue as string)
               }}
             >
-            {categories.length > 0 ? categories.map(category => (
-              <Picker.Item key={category.uid} value={category.uid} label={category.categoryName} />
-              )): (
-              <Picker.Item value="" label="Carregando..." />
-            )}
+            {categories.length > 0
+              ? categories.map(category => (
+                <Picker.Item
+                  key={category.uid}
+                  value={category.uid}
+                  label={category.name}
+                />
+              ))
+              : (
+                <Picker.Item value="" label="Carregando..." />
+              )}
             </Picker>
           </SelectContainer>
 
@@ -175,7 +186,7 @@ const AddTransaction: React.FC = () => {
       >
         <Camera
           onSave={(pic) => {
-            setPicture(pic.uri);
+            setPicture(pic);
             setCameraVisible(false)
           }}
         />
