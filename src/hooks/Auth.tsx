@@ -27,6 +27,7 @@ const AuthProvider: React.FC = ({ children }) => {
 
   const signOut = useCallback(async () => {
     AsyncStorage.removeItem('@financial-user')
+    setUser({} as User);
     await signOutUser();
   }, []);
 
