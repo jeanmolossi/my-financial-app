@@ -11,9 +11,9 @@ type RouteParams = {
 } | undefined;
 
 const { width } = Dimensions.get('window');
-const PERSPECTIVE = width + 5;
-const ANGLE = Math.atan(PERSPECTIVE / (width / 2));
+const PERSPECTIVE = width + 20;
 const RATIO = Platform.OS === 'ios' ? 2 : 1.2;
+const ANGLE = Math.atan(PERSPECTIVE / (width / 2));
 
 const Coupons: React.FC = () => {
   const { setParams } = useNavigation();
@@ -54,6 +54,7 @@ const Coupons: React.FC = () => {
     const translateX = x.interpolate({
       inputRange,
       outputRange: [width/RATIO, -width/RATIO],
+      extrapolate: 'clamp'
     });
 
     const rotateY = x.interpolate({
@@ -65,30 +66,16 @@ const Coupons: React.FC = () => {
     const translateX1 = x.interpolate({
       inputRange,
       outputRange: [width/2, -width/2],
+      extrapolate: 'clamp'
     });
 
-    const extra = width / RATIO / Math.cos(ANGLE / 2) - width / RATIO;
+    const extra = width / RATIO / Math.cos(ANGLE / 1.85) - width / RATIO;
 
     const translateX2 = x.interpolate({
       inputRange,
       outputRange: [-extra, extra],
+      extrapolate: 'clamp'
     })
-
-    const translateX3 = x.interpolate({
-      inputRange,
-      outputRange: [width/1.2,-width/1.2]
-    })
-
-    // const rotateY_value = rotateY.__getValue();
-
-    // const parsed = parseFloat(rotateY_value.substring(0, rotateY_value.indexOf('rad')));
-    // const alpha  = Math.abs(parsed);
-    // const beta = ANGLE - alpha;
-    // const gamma = Math.PI - alpha - beta;
-    // const y = width / 2 - width / 2 * Math.sin(beta) / Math.sin(gamma);
-    // const translateX2 = parsed > 0 ? y : -y;
-
-    // console.log(rotateY.__getValue())
 
     return {
       ...StyleSheet.absoluteFillObject,
