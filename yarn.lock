@@ -3037,9 +3037,9 @@ expo-camera@~9.1.0:
     lodash "^4.6.0"
 
 expo-checkbox@~1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/expo-checkbox/-/expo-checkbox-1.0.1.tgz#df2abd3e474d3305438def5457013d0c315bb5a5"
-  integrity sha512-cIsWlERFxjcIKG6Es4kX/t/33cXM27OpLzygZ1bDsE7+O8NRcsNpyQzYOxrCpOVFQvId+MfnueIJvOFXIhUF+A==
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/expo-checkbox/-/expo-checkbox-1.0.3.tgz#1d7510947814b19fc710fb7fc80a2433d98e3cc3"
+  integrity sha512-7w8H1yt7V1pdnbIAIoV3RvI+Rjzc8nlxy4eKdEtZhYupenLmBY173glAx+/eJcW/vlCqKYHxedQmRTqEUpAQ7A==
 
 expo-constants@~9.3.3:
   version "9.3.5"
